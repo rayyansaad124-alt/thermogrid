@@ -222,13 +222,17 @@ export default function App() {
                       totalPersonnel={teams.reduce((sum, t) => sum + t.personnel_count, 0)}
                       deployedTeamCount={deployedTeams.length}
                     />
-                    <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="grid min-h-[560px] gap-6 lg:h-[min(680px,calc(100vh-260px))] lg:grid-cols-2">
                       <AlertFeed
+                        className="h-full"
+
                         alerts={alerts.slice(0, 6)}
                         onSelect={(id) => { setView('alerts'); setSelectedAlertId(id); }}
                         compact
                       />
-                      <GlobalMap alerts={alerts} onSelect={(id) => { setView('alerts'); setSelectedAlertId(id); }} compact />
+                      <div className="h-full min-h-[420px]">
+                        <GlobalMap alerts={alerts} onSelect={(id) => { setView('alerts'); setSelectedAlertId(id); }} compact />
+                      </div>
                     </div>
                   </div>
                 )}

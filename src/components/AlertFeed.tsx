@@ -7,6 +7,7 @@ interface AlertFeedProps {
   onSelect: (id: string) => void;
   selectedId?: string | null;
   compact?: boolean;
+  className?: string;
 }
 
 const severityConfig: Record<Severity, { label: string; bg: string; text: string; border: string; dot: string }> = {
@@ -16,11 +17,11 @@ const severityConfig: Record<Severity, { label: string; bg: string; text: string
   low: { label: 'LOW', bg: 'bg-sky-500/15', text: 'text-sky-400', border: 'border-sky-500/40', dot: 'bg-sky-500' },
 };
 
-const statusConfig: Record<AlertStatus, { label: string; text: string }> = {
-  active: { label: 'Active', text: 'text-red-400' },
-  contained: { label: 'Contained', text: 'text-amber-400' },
-  controlled: { label: 'Controlled', text: 'text-sky-400' },
-  resolved: { label: 'Resolved', text: 'text-emerald-400' },
+const statusConfig: Record<AlertStatus, { label: string; text: string; bg: string }> = {
+  active: { label: 'Active', text: 'text-red-400', bg: 'bg-red-500/20' },
+  contained: { label: 'Contained', text: 'text-amber-400', bg: 'bg-amber-500/20' },
+  controlled: { label: 'Controlled', text: 'text-sky-400', bg: 'bg-sky-500/20' },
+  resolved: { label: 'Resolved', text: 'text-emerald-400', bg: 'bg-emerald-500/20' },
 };
 
 function timeAgo(iso: string): string {
@@ -32,7 +33,7 @@ function timeAgo(iso: string): string {
   return `${mins}m ago`;
 }
 
-export default function AlertFeed({ alerts, onSelect, selectedId, compact }: AlertFeedProps) {
+export default function AlertFeed({ alerts, onSelect, selectedId, compact, className }: AlertFeedProps) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [severityFilter, setSeverityFilter] = useState<Severity | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<AlertStatus | 'all'>('all');
@@ -42,8 +43,8 @@ export default function AlertFeed({ alerts, onSelect, selectedId, compact }: Ale
   ));
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-default bg-panel">
-      <div className="flex items-center justify-between border-b border-default px-5 py-4">
+    <div className={`overflow-hidden rounded-2xl border border-default bg-panel ${className ?? ''}`}>
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-default bg-panel/95 px-5 py-4 backdrop-blur">
         <div className="flex items-center gap-2">
           <Flame className="h-5 w-5 text-orange-400" />
           <h3 className="font-semibold text-primary">{compact ? 'Recent Alerts' : 'All Alerts'}</h3>
@@ -73,7 +74,7 @@ export default function AlertFeed({ alerts, onSelect, selectedId, compact }: Ale
         </div>
       )}
 
-      <div className="max-h-[600px] overflow-y-auto">
+      <div className={`${compact ? 'h-[calc(100%-65px)] max-h-[600px]' : 'max-h-[600px]'} overflow-y-auto`}>
         {filteredAlerts.length === 0 ? (
           <div className="flex h-40 items-center justify-center">
             <p className="text-sm text-muted">{alerts.length === 0 ? 'No alerts detected' : 'No alerts match these filters'}</p>
@@ -113,7 +114,7 @@ export default function AlertFeed({ alerts, onSelect, selectedId, compact }: Ale
                         <Clock className="h-3 w-3" />
                         {timeAgo(alert.detected_at)}
                       </span>
-                      <span className={`font-medium ${stat.text}`}>
+                      <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${stat.text} ${stat.bg}`}>
                         {stat.label}
                       </span>
                     </div>

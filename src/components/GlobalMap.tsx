@@ -294,10 +294,10 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
         style={{
           width: '100%',
           flex: compact ? 'none' : '1 1 0%',
-          height: compact ? 300 : '100%',
+          height: compact ? '100%' : '100%',
           minHeight: compact ? 300 : 400,
         }}
-        className="relative z-0"
+        className="relative z-0 h-full object-cover"
       />
 
       <div className="absolute right-3 top-16 z-10 flex flex-col overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950/85 shadow-xl backdrop-blur" aria-label="Map controls">

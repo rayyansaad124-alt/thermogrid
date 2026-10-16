@@ -38,17 +38,17 @@ export default function Sidebar({ view, setView, activeCount }: SidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted">Monitoring</p>
+        <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Monitoring</p>
         {navItems.slice(0, 4).map((item) => (
           <NavItem key={item.id} item={item} view={view} setView={setView} activeCount={activeCount} />
         ))}
 
-        <p className="px-3 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted">Analysis</p>
+        <p className="px-3 pb-2 pt-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Analysis</p>
         {navItems.slice(4, 6).map((item) => (
           <NavItem key={item.id} item={item} view={view} setView={setView} />
         ))}
 
-        <p className="px-3 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted">Operations</p>
+        <p className="px-3 pb-2 pt-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Operations</p>
         {navItems.slice(6).map((item) => (
           <NavItem key={item.id} item={item} view={view} setView={setView} />
         ))}

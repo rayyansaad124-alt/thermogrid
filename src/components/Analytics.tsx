@@ -296,12 +296,12 @@ export default function Analytics({ alerts, satellites }: AnalyticsProps) {
 
 function SummaryCard({ icon: Icon, label, value, color }: { icon: typeof Flame; label: string; value: string; color: string }) {
   return (
-    <div className="rounded-2xl border border-default bg-panel p-4">
+    <div className="flex min-h-[112px] flex-col justify-between rounded-2xl border border-default bg-panel p-5">
       <div className="flex items-center gap-2">
-        <Icon className={`h-4 w-4 ${color}`} />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted">{label}</span>
+        <Icon className={`h-5 w-5 ${color}`} aria-hidden="true" />
+        <span className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</span>
       </div>
-      <p className="mt-2 text-2xl font-bold text-primary">{value}</p>
+      <p className="mt-3 text-[1.35rem] font-bold leading-none text-primary">{value}</p>
     </div>
   );
 }

@@ -28,18 +28,18 @@ function StatCard({
 }) {
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-default bg-panel p-5 transition-all duration-300 hover:border-hover"
+      className="group relative flex min-h-[128px] flex-col justify-between overflow-hidden rounded-2xl border border-default bg-panel p-5 transition-colors duration-150 hover:border-hover"
       style={{ animation: `fadeInUp 0.5s ease-out ${delay}ms both` }}
     >
       <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full ${color} opacity-5 blur-2xl transition-opacity duration-300 group-hover:opacity-10`} />
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-primary">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</p>
+          <p className="mt-2 text-[1.6875rem] font-bold leading-none text-primary">{value}</p>
           <p className="mt-1 text-xs text-secondary">{sublabel}</p>
         </div>
         <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${color} bg-opacity-10`}>
-          <Icon className={`h-5 w-5 ${color.replace('bg-', 'text-')}`} />
+          <Icon className={`h-5 w-5 shrink-0 ${color.replace('bg-', 'text-')}`} aria-hidden="true" />
         </div>
       </div>
     </div>
