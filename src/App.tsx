@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { WildfireAlert, Satellite, RiskZone, ResponseTeam } from '@/types';
 import type { View } from '@/types/custom';
-import { AlertCircle, Download, Radio, RefreshCw } from 'lucide-react';
+import { AlertCircle, ArrowRight, Download, Globe2, Radio, RefreshCw } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import DashboardStats from '@/components/DashboardStats';
 import AlertFeed from '@/components/AlertFeed';
@@ -14,7 +14,6 @@ import RiskAssessment from '@/components/RiskAssessment';
 import ResponseCoordination from '@/components/ResponseCoordination';
 import Starfield from '@/components/Starfield';
 import ThemeToggle from '@/components/ThemeToggle';
-import CursorTrail from '@/components/CursorTrail';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -109,8 +108,7 @@ export default function App() {
 
   return (
     <div className="theme-transition flex min-h-screen bg-base text-primary">
-      <Starfield count={80} />
-      <CursorTrail />
+      <Starfield count={48} />
 
       <div className="relative z-10 flex w-full">
         <Sidebar view={view} setView={setView} activeCount={activeAlerts.length} />
@@ -177,7 +175,7 @@ export default function App() {
                 {view === 'dashboard' && (
                   <section className="relative isolate min-h-[calc(100vh-180px)] overflow-hidden rounded-2xl border border-default bg-slate-950">
                     <video
-                      className="absolute inset-0 -z-10 h-full w-full object-cover opacity-55"
+                      className="absolute inset-0 -z-10 h-full w-full object-cover opacity-45"
                       autoPlay
                       loop
                       muted
@@ -187,15 +185,26 @@ export default function App() {
                     >
                       <source src="https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005067/fleet_today_30sec.mp4" type="video/mp4" />
                     </video>
-                    <div className="absolute inset-0 -z-10 bg-slate-950/65" />
-                    <div className="flex min-h-[calc(100vh-180px)] items-center px-8 py-12 sm:px-16">
+                    <div className="absolute inset-0 -z-10 bg-slate-950/75" />
+                    <div className="grid min-h-[calc(100vh-180px)] items-center gap-16 px-6 py-12 sm:px-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-24 lg:px-16">
                       <div className="max-w-2xl">
-                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">ThermoGrid command center</p>
+                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-orange-300">ThermoGrid command center</p>
                         <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">See wildfire risk before it spreads.</h2>
-                        <p className="mt-6 max-w-xl text-base leading-7 text-slate-200 sm:text-lg">
-                          ThermoGrid provides real-time wildfire monitoring through satellite analytics and continuously updated thermal intelligence.
-                          Track emerging fires, assess risk, and coordinate response from one operational view.
-                        </p>
+                        <ul className="mt-6 max-w-xl space-y-3 text-base leading-7 text-slate-200 sm:text-lg">
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Track thermal anomalies from a live satellite feed.</li>
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Assess fire severity, spread, and nearby population risk.</li>
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Coordinate response teams from one operational view.</li>
+                        </ul>
+                        <button onClick={() => setView('map')} className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-[0_0_28px_rgba(242,106,46,0.25)] transition-transform hover:scale-[1.03] hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                          Open global map <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="relative flex min-h-[280px] items-center justify-center lg:min-h-[420px]" aria-label="ThermoGrid satellite globe visualization">
+                        <div className="absolute h-56 w-56 rounded-full bg-orange-500/10 blur-3xl sm:h-72 sm:w-72" />
+                        <Globe2 className="relative h-56 w-56 text-[#1F3A5F] drop-shadow-[0_0_24px_rgba(242,106,46,0.35)] sm:h-80 sm:w-80" strokeWidth={0.7} aria-hidden="true" />
+                        <span className="thermal-pulse-ring absolute left-[29%] top-[38%] h-3 w-3 rounded-full bg-orange-400 shadow-[0_0_18px_6px_rgba(242,106,46,0.45)]" />
+                        <span className="thermal-pulse-ring absolute right-[29%] top-[55%] h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_16px_5px_rgba(248,113,113,0.4)] [animation-delay:0.8s]" />
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-slate-700 bg-slate-950/80 px-4 py-2 text-xs font-medium text-slate-200 backdrop-blur">Global thermal coverage</div>
                       </div>
                     </div>
                   </section>

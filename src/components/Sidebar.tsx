@@ -98,13 +98,16 @@ function NavItem({
   return (
     <button
       onClick={() => setView(item.id)}
-      className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+      aria-current={isActive ? 'page' : undefined}
+      className={`group flex w-full items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors duration-150 ${
         isActive
-          ? 'bg-gradient-to-r from-cyan-500/20 to-transparent text-cyan-400'
-          : 'text-secondary hover:bg-panel-hover hover:text-primary'
-      }`}
+          ? item.id === 'dashboard'
+            ? 'border-orange-400 bg-[#1F3A5F]/45 text-slate-100'
+            : 'border-cyan-400 bg-cyan-500/10 text-cyan-300'
+          : 'border-transparent text-secondary hover:bg-panel-hover hover:text-primary'
+      }`} 
     >
-      <Icon className={`h-5 w-5 transition-colors ${isActive ? 'text-cyan-400' : 'text-muted group-hover:text-secondary'}`} />
+      <Icon className={`h-5 w-5 shrink-0 ${isActive ? (item.id === 'dashboard' ? 'text-orange-300' : 'text-cyan-400') : 'text-muted'}`} />
       <span>{item.label}</span>
       {item.id === 'alerts' && activeCount !== undefined && activeCount > 0 && (
         <span className="ml-auto rounded-full bg-red-500/20 px-2 py-0.5 text-[11px] font-bold text-red-400">

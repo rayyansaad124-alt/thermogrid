@@ -3,7 +3,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { loadModules } from 'esri-loader';
 import type { WildfireAlert } from '@/types';
-import { Flame, Activity, Layers as LayersIcon, LocateFixed } from 'lucide-react';
+import { Flame, Activity, Layers as LayersIcon, LocateFixed, Minus, Plus, Rotate3d } from 'lucide-react';
 
 interface GlobalMapProps {
   alerts: WildfireAlert[];
@@ -12,12 +12,6 @@ interface GlobalMapProps {
 }
 
 type ThermalLevel = 'high' | 'medium' | 'low';
-
-const levelHex: Record<ThermalLevel, string> = {
-  high: '#ef4444',
-  medium: '#f97316',
-  low: '#22c55e',
-};
 
 function getThermalLevel(confidence: number): ThermalLevel {
   if (confidence >= 70) return 'high';
@@ -36,6 +30,7 @@ function getLevelRGB(level: ThermalLevel): [number, number, number] {
 interface EsriBundle {
   Map: any;
   MapView: any;
+  SceneView: any;
   Graphic: any;
   GraphicsLayer: any;
   Point: any;
@@ -53,6 +48,7 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
   const [mapError, setMapError] = useState(false);
   const [retryToken, setRetryToken] = useState(0);
   const [locationError, setLocationError] = useState(false);
+  const [perspective, setPerspective] = useState<'2d' | '3d'>('2d');
   onSelectRef.current = onSelect;
 
   const createMap = useCallback((esri: EsriBundle) => {
@@ -74,7 +70,8 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
   const createView = useCallback((esri: EsriBundle, map: any): any => {
     if (!containerRef.current) return null;
 
-    return new esri.MapView({
+    const View = perspective === '3d' ? esri.SceneView : esri.MapView;
+    return new View({
       map,
       container: containerRef.current,
       center: [10, 20] as [number, number],
@@ -87,7 +84,7 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
         components: ['zoom', 'compass'],
       },
     });
-  }, [compact]);
+  }, [compact, perspective]);
 
   const addAlertGraphics = useCallback((esri: EsriBundle, activeAlerts: WildfireAlert[]) => {
     const graphicsLayer = graphicsLayerRef.current;
@@ -186,15 +183,16 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
     loadModules([
       'esri/Map',
       'esri/views/MapView',
+      'esri/views/SceneView',
       'esri/Graphic',
       'esri/layers/GraphicsLayer',
       'esri/geometry/Point',
     ], {
       css: false,
-    }).then(([Map, MapView, Graphic, GraphicsLayer, Point]: any[]) => {
+    }).then(([Map, MapView, SceneView, Graphic, GraphicsLayer, Point]: any[]) => {
       if (cancelled || !containerRef.current) return;
 
-      const esri: EsriBundle = { Map, MapView, Graphic, GraphicsLayer, Point };
+      const esri: EsriBundle = { Map, MapView, SceneView, Graphic, GraphicsLayer, Point };
       esriRef.current = esri;
 
       createMap(esri);
@@ -231,7 +229,7 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
       pulseLayerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retryToken]);
+  }, [retryToken, perspective]);
 
   // Update graphics when alerts change
   useEffect(() => {
@@ -243,6 +241,12 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
 
 
   const activeCount = alerts.filter((a) => a.status === 'active').length;
+
+  const adjustZoom = (delta: number) => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.goTo({ zoom: Math.max(1, Math.min(16, (view.zoom ?? 2) + delta)) });
+  };
 
   const useMyLocation = () => {
     if (!navigator.geolocation || !viewRef.current) {
@@ -296,7 +300,13 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
         className="relative z-0"
       />
 
-      {locationError && <p role="status" className="absolute right-3 top-16 z-20 rounded-lg border border-orange-500/40 bg-slate-950/90 px-3 py-2 text-xs text-orange-200">Location access was unavailable.</p>}
+      <div className="absolute right-3 top-16 z-10 flex flex-col overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950/85 shadow-xl backdrop-blur" aria-label="Map controls">
+        <button onClick={() => adjustZoom(1)} className="flex h-11 w-11 items-center justify-center text-slate-200 hover:bg-slate-800 hover:text-white" aria-label="Zoom in"><Plus className="h-4 w-4" /></button>
+        <button onClick={() => adjustZoom(-1)} className="flex h-11 w-11 items-center justify-center border-t border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-white" aria-label="Zoom out"><Minus className="h-4 w-4" /></button>
+        <button onClick={() => setPerspective((mode) => mode === '2d' ? '3d' : '2d')} className="flex h-11 items-center justify-center gap-1 border-t border-slate-700 px-2 text-[10px] font-bold uppercase tracking-wide text-orange-300 hover:bg-slate-800" aria-pressed={perspective === '3d'} aria-label={`Switch to ${perspective === '2d' ? '3D' : '2D'} perspective`}><Rotate3d className="h-3.5 w-3.5" />{perspective}</button>
+      </div>
+
+      {locationError && <p role="status" className="absolute left-3 top-16 z-20 rounded-lg border border-orange-500/40 bg-slate-950/90 px-3 py-2 text-xs text-orange-200">Location access was unavailable.</p>}
 
       {/* Loading indicator */}
       {!ready && !mapError && (
@@ -334,32 +344,15 @@ export default function GlobalMap({ alerts, onSelect, compact }: GlobalMapProps)
         </div>
       </div>
 
-      {/* Bottom-right legend: THERMAL DETECTION */}
-      <div
-        className="pointer-events-none absolute z-10 right-3 bottom-3"
-        style={{ marginBottom: compact ? '8px' : '24px', marginRight: compact ? '8px' : '12px' }}
-      >
-        <div className="rounded-lg border border-slate-700/60 bg-space-950/85 px-3.5 py-3 shadow-xl backdrop-blur-sm">
-          <div className="mb-2.5 flex items-center gap-1.5">
-            <Activity className="h-3.5 w-3.5 text-cyan-400" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-white">Thermal Detection</span>
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: levelHex.high, boxShadow: `0 0 6px ${levelHex.high}` }} />
-              <span className="text-[11px] font-medium text-slate-300">High</span>
-              <span className="text-[10px] text-slate-500">70-100</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: levelHex.medium, boxShadow: `0 0 6px ${levelHex.medium}` }} />
-              <span className="text-[11px] font-medium text-slate-300">Medium</span>
-              <span className="text-[10px] text-slate-500">40-69</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: levelHex.low, boxShadow: `0 0 6px ${levelHex.low}` }} />
-              <span className="text-[11px] font-medium text-slate-300">Low</span>
-              <span className="text-[10px] text-slate-500">0-39</span>
-            </div>
+      <div className="pointer-events-none absolute bottom-3 right-3 z-10" style={{ marginBottom: compact ? '8px' : '24px' }}>
+        <div className="rounded-lg border border-slate-700/60 bg-space-950/90 px-3 py-2.5 shadow-xl backdrop-blur-sm">
+          <div className="mb-2 flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-orange-400" /><span className="text-[10px] font-bold uppercase tracking-wider text-white">Risk level</span></div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+            {([
+              ['Low', '#22c55e'], ['Moderate', '#f59e0b'], ['High', '#f97316'], ['Extreme', '#ef4444'],
+            ] as const).map(([label, color]) => (
+              <div key={label} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} /><span className="text-[10px] text-slate-300">{label}</span></div>
+            ))}
           </div>
         </div>
       </div>
