@@ -1,4 +1,4 @@
-import { LayoutGrid, Flame, Satellite, Map, BarChart3, AlertCircle, Users, Gauge } from 'lucide-react';
+import { LayoutGrid, Flame, Satellite, Map, BarChart3, AlertCircle, Users, Gauge, Upload } from 'lucide-react';
 import type { View } from '@/types/custom';
 
 interface SidebarProps {
@@ -16,6 +16,7 @@ const navItems: { id: View; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'risk', label: 'Risk Assessment', icon: AlertCircle },
   { id: 'response', label: 'Response Teams', icon: Users },
   { id: 'satellites', label: 'Satellite Fleet', icon: Satellite },
+  { id: 'upload', label: 'Upload CSV', icon: Upload },
 ];
 
 export default function Sidebar({ view, setView, activeCount }: SidebarProps) {

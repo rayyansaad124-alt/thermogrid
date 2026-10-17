@@ -12,6 +12,7 @@ const GlobalMap = lazy(() => import('@/components/GlobalMap'));
 const Analytics = lazy(() => import('@/components/Analytics'));
 import RiskAssessment from '@/components/RiskAssessment';
 import ResponseCoordination from '@/components/ResponseCoordination';
+import CSVUpload from '@/components/CSVUpload';
 import Starfield from '@/components/Starfield';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -93,6 +94,7 @@ export default function App() {
     analytics: 'Thermal Analytics',
     risk: 'Risk Assessment',
     response: 'Response Coordination',
+    upload: 'Upload CSV Data',
   };
 
   const headerSubtitle: Record<View, string> = {
@@ -104,6 +106,7 @@ export default function App() {
     analytics: 'Detection trends and statistical breakdowns',
     risk: `${extremeZones.length} zones at elevated risk levels`,
     response: `${deployedTeams.length} teams deployed across ${new Set(deployedTeams.map((t) => t.base_location)).size} bases`,
+    upload: 'Import data from a CSV file into any monitoring table',
   };
 
   return (
@@ -267,6 +270,8 @@ export default function App() {
                 {view === 'response' && (
                   <ResponseCoordination teams={teams} alerts={alerts} onSelectAlert={(id) => { setView('alerts'); setSelectedAlertId(id); }} />
                 )}
+
+                {view === 'upload' && <CSVUpload />}
               </Suspense>
             )}
           </div>
