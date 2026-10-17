@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Flame, Thermometer, Gauge, Activity, TrendingUp, ShieldCheck, ExternalLink } from 'lucide-react';
+import { MapPin, Flame, Thermometer, Gauge, Activity, TrendingUp, ShieldCheck, ExternalLink, Satellite } from 'lucide-react';
 import type { WildfireAlert, AlertUpdate, Severity, AlertStatus } from '@/types';
 import { supabase } from '@/lib/supabase';
 
@@ -72,6 +72,27 @@ export default function AlertDetail({ alert }: AlertDetailProps) {
       </div>
 
       <div className="space-y-5 p-5">
+        {/* Satellite source banner */}
+        {alert.satellite_source && (
+          <div className="flex items-center justify-between rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Satellite className="h-4 w-4 text-cyan-400" />
+              <div>
+                <p className="text-xs font-semibold text-cyan-300">Detected by {alert.satellite_source}</p>
+                {alert.scan_direction && (
+                  <p className="text-[11px] text-muted">{alert.scan_direction} scan · NASA FIRMS</p>
+                )}
+              </div>
+            </div>
+            {alert.brightness && (
+              <div className="text-right">
+                <p className="text-xs font-bold text-orange-400">{alert.brightness} K</p>
+                <p className="text-[10px] text-muted">Brightness</p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3">
           <MetricCard icon={TrendingUp} label="Acres Burned" value={alert.area_acres.toLocaleString()} />
           <MetricCard icon={Thermometer} label="Surface Temp" value={`${alert.temperature_c}°C`} />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flame, Clock, MapPin, TrendingUp, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { Flame, Clock, MapPin, TrendingUp, ChevronRight, SlidersHorizontal, Satellite } from 'lucide-react';
 import type { WildfireAlert, Severity, AlertStatus } from '@/types';
 
 interface AlertFeedProps {
@@ -114,6 +114,12 @@ export default function AlertFeed({ alerts, onSelect, selectedId, compact, class
                         <Clock className="h-3 w-3" />
                         {timeAgo(alert.detected_at)}
                       </span>
+                      {alert.satellite_source && (
+                        <span className="flex items-center gap-1 text-cyan-400">
+                          <Satellite className="h-3 w-3" />
+                          {alert.satellite_source}
+                        </span>
+                      )}
                       <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${stat.text} ${stat.bg}`}>
                         {stat.label}
                       </span>
