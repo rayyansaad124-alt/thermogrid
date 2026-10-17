@@ -23,6 +23,10 @@ export interface WildfireAlert {
   detected_at: string;
   updated_at: string;
   created_at: string;
+  source_id?: string | null;
+  satellite_source?: string | null;
+  scan_direction?: string | null;
+  brightness?: number | null;
 }
 
 export interface Satellite {
