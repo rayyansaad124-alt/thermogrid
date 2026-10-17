@@ -2,12 +2,13 @@ import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { WildfireAlert, Satellite, RiskZone, ResponseTeam } from '@/types';
 import type { View } from '@/types/custom';
-import { AlertCircle, ArrowRight, Download, Globe2, Radio, RefreshCw } from 'lucide-react';
+import { AlertCircle, ArrowRight, Download, Globe2, Radio, RefreshCw, Satellite as SatelliteIcon } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import DashboardStats from '@/components/DashboardStats';
 import AlertFeed from '@/components/AlertFeed';
 import AlertDetail from '@/components/AlertDetail';
 import SatelliteFleet from '@/components/SatelliteFleet';
+import FirmsSyncControl from '@/components/FirmsSyncControl';
 const GlobalMap = lazy(() => import('@/components/GlobalMap'));
 const Analytics = lazy(() => import('@/components/Analytics'));
 import RiskAssessment from '@/components/RiskAssessment';
@@ -139,6 +140,7 @@ export default function App() {
                 <Radio className="h-4 w-4 text-cyan-400" />
                 <span>{activeSatellites.length} satellites online</span>
               </div>
+              <FirmsSyncControl />
               <span className="hidden text-xs text-muted xl:block">
                 {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Updating...'}
               </span>
@@ -191,13 +193,19 @@ export default function App() {
                         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-orange-300">ThermoGrid command center</p>
                         <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">See wildfire risk before it spreads.</h2>
                         <ul className="mt-6 max-w-xl space-y-3 text-base leading-7 text-slate-200 sm:text-lg">
-                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Track thermal anomalies from a live satellite feed.</li>
-                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Assess fire severity, spread, and nearby population risk.</li>
-                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Coordinate response teams from one operational view.</li>
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Live fire detections from NASA FIRMS satellite data.</li>
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />VIIRS & MODIS thermal anomalies, updated every 15 minutes.</li>
+                          <li className="flex gap-3"><span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />Assess fire severity, spread, and coordinate response.</li>
                         </ul>
-                        <button onClick={() => setView('map')} className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-[0_0_28px_rgba(242,106,46,0.25)] transition-transform hover:scale-[1.03] hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-slate-950">
-                          Open global map <ArrowRight className="h-4 w-4" />
-                        </button>
+                        <div className="mt-8 flex flex-wrap gap-3">
+                          <button onClick={() => setView('map')} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-[0_0_28px_rgba(242,106,46,0.25)] transition-transform hover:scale-[1.03] hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                            Open global map <ArrowRight className="h-4 w-4" />
+                          </button>
+                          <div className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-xs text-slate-300 backdrop-blur">
+                            <SatelliteIcon className="h-4 w-4 text-orange-400" />
+                            <span>Powered by NASA FIRMS WFS</span>
+                          </div>
+                        </div>
                       </div>
                       <div className="relative flex min-h-[280px] items-center justify-center lg:min-h-[420px]" aria-label="ThermoGrid satellite globe visualization">
                         <div className="absolute h-56 w-56 rounded-full bg-orange-500/10 blur-3xl sm:h-72 sm:w-72" />
@@ -221,6 +229,8 @@ export default function App() {
                       activeSatelliteCount={activeSatellites.length}
                       totalPersonnel={teams.reduce((sum, t) => sum + t.personnel_count, 0)}
                       deployedTeamCount={deployedTeams.length}
+                      avgConfidence={alerts.length > 0 ? Math.round(alerts.reduce((sum, a) => sum + a.confidence, 0) / alerts.length) : 0}
+                      firmsDetections={alerts.filter((a) => a.source_id).length}
                     />
                     <div className="grid min-h-[560px] gap-6 lg:h-[min(680px,calc(100vh-260px))] lg:grid-cols-2">
                       <AlertFeed

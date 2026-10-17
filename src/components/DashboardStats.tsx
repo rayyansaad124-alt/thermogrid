@@ -9,6 +9,8 @@ interface DashboardStatsProps {
   activeSatelliteCount: number;
   totalPersonnel: number;
   deployedTeamCount: number;
+  avgConfidence: number;
+  firmsDetections: number;
 }
 
 function StatCard({
@@ -55,6 +57,8 @@ export default function DashboardStats({
   activeSatelliteCount,
   totalPersonnel,
   deployedTeamCount,
+  avgConfidence,
+  firmsDetections,
 }: DashboardStatsProps) {
   return (
     <>
@@ -71,8 +75,8 @@ export default function DashboardStats({
         <StatCard icon={SatelliteIcon} label="Satellites" value={`${activeSatelliteCount}/${satelliteCount}`} sublabel="Operational fleet" color="bg-cyan-500" delay={180} />
         <StatCard icon={Users} label="Personnel" value={totalPersonnel.toLocaleString()} sublabel="Total response staff" color="bg-emerald-500" delay={240} />
         <StatCard icon={Truck} label="Teams Deployed" value={String(deployedTeamCount)} sublabel="Active in the field" color="bg-violet-500" delay={300} />
-        <StatCard icon={Radar} label="Coverage" value="Global" sublabel="24/7 thermal scanning" color="bg-sky-500" delay={360} />
-        <StatCard icon={AlertTriangle} label="Avg Confidence" value="84%" sublabel="AI detection accuracy" color="bg-teal-500" delay={420} />
+        <StatCard icon={Radar} label="Coverage" value="Global" sublabel={`${firmsDetections} FIRMS detections`} color="bg-sky-500" delay={360} />
+        <StatCard icon={AlertTriangle} label="Avg Confidence" value={`${avgConfidence}%`} sublabel="AI detection accuracy" color="bg-teal-500" delay={420} />
       </div>
     </>
   );
